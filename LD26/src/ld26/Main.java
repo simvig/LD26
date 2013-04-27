@@ -1,5 +1,8 @@
 package ld26;
 
+import ld26.input.InputHandler;
+import ld26.map.Map;
+
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
@@ -15,7 +18,7 @@ public class Main extends BasicGame {
 	public static void main(String[] args) {
 		try {
 			AppGameContainer container = new AppGameContainer(new Main());
-			container.setDisplayMode(800, 600, false);
+			container.setDisplayMode(1024, 768, false);
 			container.start();
 		} catch(SlickException e) {
 			// TODO Auto-generated catch block
@@ -29,9 +32,9 @@ public class Main extends BasicGame {
 	 * org.newdawn.slick.Graphics)
 	 */
 	@Override
-	public void render(GameContainer arg0, Graphics arg1) throws SlickException {
-		// TODO Auto-generated method stub
-
+	public void render(GameContainer container, Graphics g)
+			throws SlickException {
+		Map.getInstance().draw(container, g);
 	}
 
 	/*
@@ -40,8 +43,7 @@ public class Main extends BasicGame {
 	 */
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
-		// TODO Auto-generated method stub
-
+		Map.getInstance().init();
 	}
 
 	/*
@@ -50,9 +52,9 @@ public class Main extends BasicGame {
 	 * int)
 	 */
 	@Override
-	public void update(GameContainer arg0, int arg1) throws SlickException {
-		// TODO Auto-generated method stub
-
+	public void update(GameContainer container, int delta)
+			throws SlickException {
+		InputHandler.getInstance().handleInput(container);
 	}
 
 }
