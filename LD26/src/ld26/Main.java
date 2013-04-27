@@ -2,6 +2,7 @@ package ld26;
 
 import ld26.input.InputHandler;
 import ld26.map.Map;
+import ld26.village.Village;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
@@ -35,6 +36,7 @@ public class Main extends BasicGame {
 	public void render(GameContainer container, Graphics g)
 			throws SlickException {
 		Map.getInstance().draw(container, g);
+		Village.getInstance().draw(g);
 	}
 
 	/*
@@ -44,6 +46,7 @@ public class Main extends BasicGame {
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		Map.getInstance().init();
+		Village.getInstance().init();
 	}
 
 	/*
@@ -55,6 +58,8 @@ public class Main extends BasicGame {
 	public void update(GameContainer container, int delta)
 			throws SlickException {
 		InputHandler.getInstance().handleInput(container);
+
+		Village.getInstance().update(delta);
 	}
 
 }

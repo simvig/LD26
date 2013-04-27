@@ -134,7 +134,7 @@ public class BuildingSpotHelper extends BasicGame {
 			size = 1;
 		}
 
-		if(input.isKeyPressed(Input.KEY_2)) {
+		if(input.isKeyPressed(Input.KEY_3)) {
 			size = 2;
 		}
 
@@ -159,6 +159,7 @@ public class BuildingSpotHelper extends BasicGame {
 		}
 		try {
 			PrintWriter out = new PrintWriter(output);
+			out.println(buildingSpots.size());
 			for(BuildingSpot spot : buildingSpots) {
 				out.println(spot.toString());
 			}

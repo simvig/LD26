@@ -7,6 +7,8 @@ public class BuildingSpot {
 	public float	rotation;
 	public int		area;
 
+	// public boolean occupied = false;
+
 	public BuildingSpot(int x, int y, int size, float rotation, int area) {
 		super();
 		this.x = x;
