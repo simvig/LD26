@@ -3,6 +3,7 @@ package ld26;
 import ld26.ai.VillagerPathfinding;
 import ld26.input.InputHandler;
 import ld26.map.Map;
+import ld26.ui.UI;
 import ld26.village.Village;
 
 import org.newdawn.slick.AppGameContainer;
@@ -39,6 +40,8 @@ public class Main extends BasicGame {
 		Map.getInstance().draw(container, g);
 		Village.getInstance().draw(g);
 		// VillagerPathfinding.getInstance().drawBlockMap(g);
+
+		UI.draw(g);
 	}
 
 	/*

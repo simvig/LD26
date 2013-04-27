@@ -7,6 +7,12 @@ import org.newdawn.slick.Image;
 
 public class Building {
 
+	private Role	role;
+
+	public Role getRole() {
+		return role;
+	}
+
 	private Image	image;
 	private int		x;
 	private int		y;
@@ -126,9 +132,17 @@ public class Building {
 	public void addMaterials(int number) {
 		materials += number;
 		materialsReserved -= number;
+		if(isComplete() && role == null) {
+			role = Role.BUILDER;
+			Village.getInstance().addBuilder();
+		}
 	}
 
 	public boolean isComplete() {
 		return materials >= constructionCost;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 }

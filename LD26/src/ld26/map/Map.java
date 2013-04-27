@@ -32,7 +32,7 @@ public class Map {
 
 	public void init() {
 		try {
-			mapImage = new Image("Data/map.jpg");
+			mapImage = new Image("Data/Images/map.jpg");
 			selectionMask = new Image("Data/selectionMask.png");
 
 			File dataDir = new File("Data");

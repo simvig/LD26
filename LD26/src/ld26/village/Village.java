@@ -99,7 +99,9 @@ public class Village {
 		}
 	}
 
-	private static final int	SPAWN_DELAY		= 1000;
+	private int					totalBuilders;
+
+	private static final int	SPAWN_DELAY		= 100;
 	private static final int	VILLAGER_SPEED	= 50;			// milliseconds
 																// per pixel
 
@@ -107,12 +109,29 @@ public class Village {
 
 	private int					spawnCounter	= SPAWN_DELAY;
 
-	public void update(int delta) {
-		spawnCounter -= delta;
+	public int getPopulation() {
+		return totalBuilders;
+	}
+
+	public int getBuilders() {
+		return totalBuilders;
+	}
+
+	private void spawnBuilder() {
 		Building b = unfinishedBuilding();
 		if(spawnCounter <= 0 && b != null) {
+			List<Building> eligibleBuildings = new ArrayList<>();
+			for(Building build : buildings) {
+				if(build == center
+						|| (build.isComplete() && build.getRole() == Role.BUILDER)) {
+					eligibleBuildings.add(build);
+				}
+			}
+			Building home = eligibleBuildings
+					.get((int)(Math.random() * eligibleBuildings.size()));
+
 			Path path = VillagerPathfinding.getInstance().findPath(
-					center.getDoorX(), center.getDoorY(), b.getDoorX(),
+					home.getDoorX(), home.getDoorY(), b.getDoorX(),
 					b.getDoorY());
 			if(path == null) {
 				b.setUnreachable(true);
@@ -121,13 +140,20 @@ public class Village {
 				spawnCounter = SPAWN_DELAY;
 				builders--;
 				b.sendBuilder();
-				Person p = new Person(center.getX(), center.getY());
+				Person p = new Person(home.getX(), home.getY());
 				p.setRole(Role.BUILDER);
 				p.setPath(path);
 				p.setJob(new BuildJob(b));
 				population.add(p);
 			}
 		}
+	}
+
+	public void update(int delta) {
+		spawnCounter -= delta;
+
+		spawnBuilder();
+
 		lastUpdate += delta;
 		Person personToRemove = null;
 		for(Person p : population) {
@@ -174,6 +200,7 @@ public class Village {
 		buildingSpots.remove(spot);
 
 		builders += 10;
+		totalBuilders += 10;
 
 		return true;
 	}
@@ -217,5 +244,10 @@ public class Village {
 			return spots.get((int)(Math.random() * spots.size()));
 		}
 		return null;
+	}
+
+	public void addBuilder() {
+		builders++;
+		totalBuilders++;
 	}
 }
