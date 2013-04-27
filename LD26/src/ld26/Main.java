@@ -1,5 +1,6 @@
 package ld26;
 
+import ld26.ai.VillagerPathfinding;
 import ld26.input.InputHandler;
 import ld26.map.Map;
 import ld26.village.Village;
@@ -37,6 +38,7 @@ public class Main extends BasicGame {
 			throws SlickException {
 		Map.getInstance().draw(container, g);
 		Village.getInstance().draw(g);
+		// VillagerPathfinding.getInstance().drawBlockMap(g);
 	}
 
 	/*
@@ -46,6 +48,7 @@ public class Main extends BasicGame {
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		Map.getInstance().init();
+		VillagerPathfinding.getInstance().init();
 		Village.getInstance().init();
 	}
 

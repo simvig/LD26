@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ld26.BuildingSpot;
+import ld26.ai.BuildJob;
+import ld26.ai.VillagerPathfinding;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.util.pathfinding.Path;
 
 public class Village {
 	private List<BuildingSpot>	buildingSpots;
@@ -25,6 +28,8 @@ public class Village {
 	private Building			center;
 
 	private List<Person>		population;
+
+	private int					builders	= 0;
 
 	private Village() {
 
@@ -44,7 +49,7 @@ public class Village {
 			p.draw(g);
 		}
 		for(Building b : buildings) {
-			b.draw();
+			b.draw(g);
 		}
 	}
 
@@ -60,6 +65,8 @@ public class Village {
 		villageCenter = new Image("Data/villageCenter.png");
 
 		population = new ArrayList<>();
+
+		constructVillageCenter(1);
 	}
 
 	private void loadBuildingSpots() {
@@ -92,21 +99,55 @@ public class Village {
 		}
 	}
 
-	private int	lastUpdate	= 0;
+	private static final int	SPAWN_DELAY		= 1000;
+	private static final int	VILLAGER_SPEED	= 50;			// milliseconds
+																// per pixel
+
+	private int					lastUpdate		= 0;
+
+	private int					spawnCounter	= SPAWN_DELAY;
 
 	public void update(int delta) {
-		lastUpdate += delta;
-		if(lastUpdate > 1000) {
-			lastUpdate = 0;
-			for(Building b : buildings) {
-				if(!b.isComplete()) {
-					b.addMaterials(1);
-				}
+		spawnCounter -= delta;
+		Building b = unfinishedBuilding();
+		if(spawnCounter <= 0 && b != null) {
+			Path path = VillagerPathfinding.getInstance().findPath(
+					center.getDoorX(), center.getDoorY(), b.getDoorX(),
+					b.getDoorY());
+			if(path == null) {
+				b.setUnreachable(true);
+				System.out.println("Building unreachable");
+			} else if(builders > 0) {
+				spawnCounter = SPAWN_DELAY;
+				builders--;
+				b.sendBuilder();
+				Person p = new Person(center.getX(), center.getY());
+				p.setRole(Role.BUILDER);
+				p.setPath(path);
+				p.setJob(new BuildJob(b));
+				population.add(p);
 			}
 		}
-
+		lastUpdate += delta;
+		Person personToRemove = null;
 		for(Person p : population) {
-			p.update();
+			if(p.isDone()) {
+				personToRemove = p;
+			}
+		}
+		if(personToRemove != null) {
+			switch(personToRemove.getRole()) {
+				case BUILDER:
+					builders++;
+					break;
+			}
+			population.remove(personToRemove);
+		}
+		if(lastUpdate > VILLAGER_SPEED) {
+			lastUpdate = 0;
+			for(Person p : population) {
+				p.update();
+			}
 		}
 	}
 
@@ -132,12 +173,18 @@ public class Village {
 		buildings.add(center);
 		buildingSpots.remove(spot);
 
-		// temporary
-		for(int i = 0; i < 10; i++) {
-			population.add(new Person(center.getX(), center.getY()));
-		}
+		builders += 10;
 
 		return true;
+	}
+
+	private Building unfinishedBuilding() {
+		for(Building b : buildings) {
+			if(b.needsBuilders()) {
+				return b;
+			}
+		}
+		return null;
 	}
 
 	private boolean constructHut(int area, int size) {
