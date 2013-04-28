@@ -1,5 +1,6 @@
 package ld26.ai;
 
+import ld26.ui.SoundManager;
 import ld26.village.Building;
 import ld26.village.Person;
 
@@ -18,6 +19,7 @@ public class BuildJob extends Job {
 	@Override
 	public void doJob() {
 		building.addMaterials(1);
+		SoundManager.playBuild();
 	}
 
 }

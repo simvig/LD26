@@ -47,32 +47,44 @@ public class Village {
 	private Image[] farmIncomplete;
 	private int food = 100;
 
+	private int goldMiners = 0;
 	private int lastUpdate = 0;
+
+	private Image mediumHut;
+	private Image[] mediumHutIncomplete;
 	private Image mine;
 
 	private Image[] mineIncomplete;
-	private int miners = 0;
-	private List<Person> population;
 
+	private int miners = 0;
+
+	private List<Person> population;
 	private Image smallHut;
 
 	private Image[] smallHutIncomplete;
-
 	private int stone = 0;
-	private Image villageCenter;
 
+	private Image villageCenter;
+	private int wine = 0;
+
+	private int winemakers = 0;
+	private Image winery;
+
+	private Image[] wineryIncomplete;
 	private int wood = 100;
+
 	private Image woodcutter;
 
 	private Image[] woodcutterIncomplete;
+
 	private int woodcutters = 0;
 
 	private Village() {
 
 	}
 
-	public void addBuilder() {
-		builders++;
+	public void addBuilder(int n) {
+		builders += n;
 	}
 
 	public void addFarmer(int n) {
@@ -81,6 +93,10 @@ public class Village {
 
 	public void addFood(int n) {
 		food += n;
+	}
+
+	public void addGoldMiners(int i) {
+		goldMiners += i;
 	}
 
 	public void addMiner(int i) {
@@ -93,6 +109,14 @@ public class Village {
 
 	public void addStone(int n) {
 		stone += n;
+	}
+
+	public void addWine(int n) {
+		wine += n;
+	}
+
+	public void addWinemaker(int n) {
+		winemakers += n;
 	}
 
 	public void addWood(int n) {
@@ -142,6 +166,8 @@ public class Village {
 				return constructFarm(area);
 			case 3:
 				return constructMine(area);
+			case 4:
+				return constructWinery(area);
 			case 5:
 				return constructBridge(area);
 			default:
@@ -175,6 +201,8 @@ public class Village {
 		}
 
 		Building b = new Building(spot.x, spot.y, spot.rotation, smallHut);
+		b.size = 0;
+		b.spotSize = spot.size;
 		b.setIncompleteImages(smallHutIncomplete);
 		b.setConstructionCost(5);
 		b.setMaterials(0);
@@ -221,6 +249,25 @@ public class Village {
 		center.addBuilder(10);
 		builders += 10;
 
+		return true;
+	}
+
+	private boolean constructWinery(int area) {
+		BuildingSpot spot = findFreeSpot(area, 2);
+		if(spot == null) {
+			return false;
+		}
+
+		Building b = new Building(spot.x, spot.y, spot.rotation, winery);
+		b.setIncompleteImages(wineryIncomplete);
+		b.setConstructionCost(20);
+		b.setMaterials(0);
+		b.setRole(Role.WINEMAKER);
+
+		buildings.add(b);
+
+		buildingSpots.remove(spot);
+		findFreeSpot(area, 2);
 		return true;
 	}
 
@@ -283,16 +330,29 @@ public class Village {
 		return food;
 	}
 
+	public int getGoldMiners() {
+		return goldMiners;
+	}
+
 	public int getMiners() {
 		return miners;
 	}
 
 	public int getPopulation() {
-		return builders + woodcutters + farmers + miners;
+		return builders + woodcutters + farmers + miners + winemakers
+				+ goldMiners;
 	}
 
 	public int getStone() {
 		return stone;
+	}
+
+	public int getWine() {
+		return wine;
+	}
+
+	public int getWinemakers() {
+		return winemakers;
 	}
 
 	public int getWood() {
@@ -339,6 +399,22 @@ public class Village {
 		bridgeIncomplete[1] = new Image("Data/Images/bridge/bridge1.png");
 		bridgeIncomplete[2] = new Image("Data/Images/bridge/bridge2.png");
 		bridgeIncomplete[3] = new Image("Data/Images/bridge/bridge3.png");
+
+		winery = new Image("Data/Images/winery.png");
+		wineryIncomplete = new Image[2];
+		wineryIncomplete[0] = new Image("Data/Images/winery/winery0.png");
+		wineryIncomplete[1] = new Image("Data/Images/winery/winery1.png");
+
+		mediumHut = new Image("Data/Images/mediumHut.png");
+		mediumHutIncomplete = new Image[4];
+		mediumHutIncomplete[0] = new Image(
+				"Data/Images/mediumHut/mediumHut0.png");
+		mediumHutIncomplete[1] = new Image(
+				"Data/Images/mediumHut/mediumHut1.png");
+		mediumHutIncomplete[2] = new Image(
+				"Data/Images/mediumHut/mediumHut2.png");
+		mediumHutIncomplete[3] = new Image(
+				"Data/Images/mediumHut/mediumHut3.png");
 
 		villageCenter = new Image("Data/villageCenter.png");
 
@@ -387,6 +463,10 @@ public class Village {
 	}
 
 	public void update(int delta) {
+		if(stone >= 20 && wine >= 20) {
+			upgradeToMedium();
+		}
+
 		for(Building b : buildings) {
 			b.update(delta);
 		}
@@ -414,6 +494,9 @@ public class Village {
 				case MINER:
 					personToRemove.getHome().addMiner(1);
 					break;
+				case WINEMAKER:
+					personToRemove.getHome().addWinemaker(1);
+					break;
 			}
 			population.remove(personToRemove);
 		}
@@ -421,6 +504,22 @@ public class Village {
 			lastUpdate = 0;
 			for(Person p : population) {
 				p.update();
+			}
+		}
+	}
+
+	private void upgradeToMedium() {
+		for(Building b : buildings) {
+			if(b.spotSize > 0 && b.size == 0) {
+				b.setMaterials(0);
+				b.setConstructionCost(20);
+				b.setIncompleteImages(mediumHutIncomplete);
+				b.setImage(mediumHut);
+				b.setReserved(0);
+				stone -= 20;
+				wine -= 20;
+				b.size = 1;
+				return;
 			}
 		}
 	}

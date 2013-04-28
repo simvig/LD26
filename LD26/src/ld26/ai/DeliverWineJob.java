@@ -4,9 +4,9 @@ import ld26.ui.SoundManager;
 import ld26.village.Person;
 import ld26.village.Village;
 
-public class DeliverWoodJob extends Job {
+public class DeliverWineJob extends Job {
 
-	public DeliverWoodJob(Person owner) {
+	public DeliverWineJob(Person owner) {
 		super(owner);
 		// TODO Auto-generated constructor stub
 	}
@@ -17,8 +17,8 @@ public class DeliverWoodJob extends Job {
 	 */
 	@Override
 	public void doJob() {
-		Village.getInstance().addWood(1);
-		SoundManager.playChop();
+		Village.getInstance().addWine(1);
+		SoundManager.playWine();
 	}
 
 }

@@ -18,6 +18,8 @@ public class UI {
 	private static Image person;
 	private static Image stone;
 	private static Image tooltip;
+	private static Image wine;
+	private static Image winemaker;
 	private static Image wood;
 
 	public static void draw(Graphics g) {
@@ -32,10 +34,12 @@ public class UI {
 		person.draw(402, 732);
 
 		miner.draw(502, 672);
+		winemaker.draw(502, 692);
 
 		wood.draw(652, 672);
 		food.draw(652, 692);
 		stone.draw(652, 712);
+		wine.draw(652, 732);
 
 		g.drawString("" + Village.getInstance().getBuilders(), 420, 670);
 		g.drawString("" + Village.getInstance().getWoodcutters(), 420, 690);
@@ -43,10 +47,12 @@ public class UI {
 		g.drawString("" + Village.getInstance().getPopulation(), 420, 730);
 
 		g.drawString("" + Village.getInstance().getMiners(), 520, 670);
+		g.drawString("" + Village.getInstance().getWinemakers(), 520, 690);
 
 		g.drawString("" + Village.getInstance().getWood(), 670, 670);
 		g.drawString("" + Village.getInstance().getFood(), 670, 690);
 		g.drawString("" + Village.getInstance().getStone(), 670, 710);
+		g.drawString("" + Village.getInstance().getWine(), 670, 730);
 	}
 
 	private static void drawTooltip(Graphics g) {
@@ -85,6 +91,12 @@ public class UI {
 					case 3:
 						string = "Build Mine 10";
 						if(Village.getInstance().getWood() < 10) {
+							color = Color.red;
+						}
+						break;
+					case 4:
+						string = "Build Winery 20";
+						if(Village.getInstance().getWood() < 20) {
 							color = Color.red;
 						}
 						break;
@@ -131,6 +143,8 @@ public class UI {
 			person = new Image("Data/Images/person.png");
 			stone = new Image("Data/Images/stone.png");
 			miner = new Image("Data/Images/miner.png");
+			wine = new Image("Data/Images/wine.png");
+			winemaker = new Image("Data/Images/winemaker.png");
 		} catch(SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

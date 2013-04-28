@@ -1,5 +1,6 @@
 package ld26.ai;
 
+import ld26.ui.SoundManager;
 import ld26.village.Person;
 import ld26.village.Village;
 
@@ -17,6 +18,7 @@ public class DeliverFoodJob extends Job {
 	@Override
 	public void doJob() {
 		Village.getInstance().addFood(1);
+		SoundManager.playFood();
 	}
 
 }

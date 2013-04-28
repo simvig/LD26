@@ -3,6 +3,7 @@ package ld26.village;
 import ld26.ai.BuildJob;
 import ld26.ai.DeliverFoodJob;
 import ld26.ai.DeliverStoneJob;
+import ld26.ai.DeliverWineJob;
 import ld26.ai.DeliverWoodJob;
 import ld26.ai.GetMaterialsJob;
 import ld26.ai.GoHomeJob;
@@ -32,9 +33,14 @@ public class Building {
 
 	private float rotation;
 
+	public int size = 0;
+
 	private int spawnCounter = Village.SPAWN_DELAY;
 
+	public int spotSize = 0;
 	private boolean unreachable;
+
+	private int winemakers = 0;
 
 	private int woodcutters = 0;
 
@@ -80,8 +86,8 @@ public class Building {
 		if(isComplete()) { // this should not trigger more than once
 			switch(role) {
 				case BUILDER:
-					builders++;
-					Village.getInstance().addBuilder();
+					builders += size + 1;
+					Village.getInstance().addBuilder(size + 1);
 					break;
 				case WOODCUTTER:
 					woodcutters += 3;
@@ -98,12 +104,20 @@ public class Building {
 				case BRIDGE:
 					Map.getInstance().accessRight();
 					break;
+				case WINEMAKER:
+					winemakers += 3;
+					Village.getInstance().addWinemaker(3);
+					break;
 			}
 		}
 	}
 
 	public void addMiner(int i) {
 		miners += i;
+	}
+
+	public void addWinemaker(int i) {
+		winemakers += i;
 	}
 
 	public void addWoodcutter(int i) {
@@ -188,12 +202,20 @@ public class Building {
 		this.constructionCost = constructionCost;
 	}
 
+	public void setImage(Image image) {
+		this.image = image;
+	}
+
 	public void setIncompleteImages(Image[] incompleteImages) {
 		this.incompleteImages = incompleteImages;
 	}
 
 	public void setMaterials(int materials) {
 		this.materials = materials;
+	}
+
+	public void setReserved(int i) {
+		materialsReserved = i;
 	}
 
 	public void setRole(Role role) {
@@ -280,6 +302,22 @@ public class Building {
 		}
 	}
 
+	private void spawnWinemaker() {
+		if(spawnCounter <= 0 && winemakers > 0
+				&& Village.getInstance().getFood() > 0) {
+			Village.getInstance().addFood(-1);
+			spawnCounter = Village.SPAWN_DELAY;
+			winemakers--;
+			Person p = new Person(this);
+			p.addWaypoint(new Waypoint(Village.getInstance().getCenter(),
+					new DeliverWineJob(p)));
+			p.addWaypoint(new Waypoint(this, new GoHomeJob(p)));
+			p.setRole(Role.WINEMAKER);
+			Village.getInstance().addPerson(p);
+			p.startRoute();
+		}
+	}
+
 	private void spawnWoodcutter() {
 		if(spawnCounter <= 0 && woodcutters > 0
 				&& Village.getInstance().getFood() > 0) {
@@ -312,6 +350,9 @@ public class Building {
 					break;
 				case MINER:
 					spawnMiner();
+					break;
+				case WINEMAKER:
+					spawnWinemaker();
 					break;
 			}
 		}

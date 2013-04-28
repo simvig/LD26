@@ -3,6 +3,7 @@ package ld26;
 import ld26.ai.VillagerPathfinding;
 import ld26.input.InputHandler;
 import ld26.map.Map;
+import ld26.ui.SoundManager;
 import ld26.ui.UI;
 import ld26.village.Village;
 
@@ -29,6 +30,7 @@ public class GameState extends BasicGameState {
 		VillagerPathfinding.getInstance().init();
 		Village.getInstance().init();
 		UI.init();
+		SoundManager.init();
 	}
 
 	/*
