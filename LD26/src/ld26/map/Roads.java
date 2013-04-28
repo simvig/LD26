@@ -13,15 +13,19 @@ public class Roads {
 	private static Image roadImage;
 	private static int threshold = 1000;
 
-	public static void advanceRoad(int x, int y) {
+	public static boolean advanceRoad(int x, int y) {
 		counter++;
 		Color c = pixels.getPixel(x, y);
 		c.a += 0.01;
+		if(c.a > 1) {
+			return false;
+		}
 		pixels.setPixel(x, y, c);
 		if(counter > threshold) {
 			counter = 0;
 			pixels.apply(roadImage.getTexture());
 		}
+		return true;
 	}
 
 	public static void draw() {

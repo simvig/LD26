@@ -7,7 +7,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class Map {
-	public static final int AREAS = 8;
+	public static final int AREAS = 20;
 
 	private static Map instance;
 
@@ -20,6 +20,7 @@ public class Map {
 
 	// private int numAreas;
 
+	private boolean[] isBlocked = new boolean[AREAS];
 	private boolean[] isFull = new boolean[AREAS];
 	private Image mapImage;
 
@@ -31,6 +32,11 @@ public class Map {
 	private Image selectionMask;
 
 	private Map() {
+
+	}
+
+	public void accessRight() {
+		// TODO Auto-generated method stub
 
 	}
 
@@ -57,6 +63,10 @@ public class Map {
 		// for(int i = 0; i < numAreas; i++) {
 		// //selectionCircles[i].draw();
 		// }
+	}
+
+	public boolean getBlocked(int n) {
+		return isBlocked[n];
 	}
 
 	public boolean getFull(int area) {
@@ -93,10 +103,17 @@ public class Map {
 			// selectionCircles[i] = new Image(filename);
 			// }
 
+			// on the island
+			isBlocked[9] = true;
+
 		} catch(SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void setBlocked(int n) {
+		isBlocked[n] = true;
 	}
 
 	public void setFull(int area) {

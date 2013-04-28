@@ -110,7 +110,13 @@ public class Person {
 			if(index < path.getLength()) {
 				x = path.getX(index);
 				y = path.getY(index);
-				Roads.advanceRoad(x, y);
+				if(Village.getInstance().getStone() > 0) {
+					if(Roads.advanceRoad(x, y)) {
+						if(Math.random() < 0.001) {
+							Village.getInstance().addStone(-1);
+						}
+					}
+				}
 				index++;
 			} else {
 				waypoints.get(routeIndex).getJob().doJob();

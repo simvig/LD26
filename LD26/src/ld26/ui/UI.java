@@ -14,7 +14,9 @@ public class UI {
 	private static Image chopper;
 	private static Image farmer;
 	private static Image food;
+	private static Image miner;
 	private static Image person;
+	private static Image stone;
 	private static Image tooltip;
 	private static Image wood;
 
@@ -29,15 +31,22 @@ public class UI {
 		farmer.draw(402, 712);
 		person.draw(402, 732);
 
+		miner.draw(502, 672);
+
 		wood.draw(652, 672);
 		food.draw(652, 692);
+		stone.draw(652, 712);
 
 		g.drawString("" + Village.getInstance().getBuilders(), 420, 670);
 		g.drawString("" + Village.getInstance().getWoodcutters(), 420, 690);
 		g.drawString("" + Village.getInstance().getFarmers(), 420, 710);
 		g.drawString("" + Village.getInstance().getPopulation(), 420, 730);
+
+		g.drawString("" + Village.getInstance().getMiners(), 520, 670);
+
 		g.drawString("" + Village.getInstance().getWood(), 670, 670);
 		g.drawString("" + Village.getInstance().getFood(), 670, 690);
+		g.drawString("" + Village.getInstance().getStone(), 670, 710);
 	}
 
 	private static void drawTooltip(Graphics g) {
@@ -45,12 +54,15 @@ public class UI {
 		String string = "";
 		Color color = Color.white;
 
+		boolean drawWood = false;
+
 		int area = Map.getInstance().getSelectedArea();
 		if(area != -1) {
 			if(Map.getInstance().getFull(area)) {
 				string = "Area Full";
 				color = Color.red;
-			} else {
+				// System.out.println("Area " + area + " full");
+			} else if(!Map.getInstance().getBlocked(area)) {
 				switch(Map.getInstance().getType()) {
 					case 0:
 						string = "Build Hut 5";
@@ -70,17 +82,35 @@ public class UI {
 							color = Color.red;
 						}
 						break;
+					case 3:
+						string = "Build Mine 10";
+						if(Village.getInstance().getWood() < 10) {
+							color = Color.red;
+						}
+						break;
+					case 5:
+						string = "Build Bridge 20";
+						if(Village.getInstance().getWood() < 20) {
+							color = Color.red;
+						}
+						break;
 					default:
 						return;
 				}
+				drawWood = true;
+			} else {
+				color = Color.yellow;
+				string = "Area Inaccessible";
+			}
+			tooltip.draw(InputHandler.getInstance().mouseX,
+					InputHandler.getInstance().mouseY - 20,
+					10 * string.length() + 20, 20);
+			if(drawWood) {
 				wood.draw(
 						InputHandler.getInstance().mouseX + 9.7f
 								* string.length(),
 						InputHandler.getInstance().mouseY - 18);
 			}
-			tooltip.draw(InputHandler.getInstance().mouseX,
-					InputHandler.getInstance().mouseY - 20,
-					10 * string.length() + 20, 20);
 
 			g.setColor(color);
 			g.drawString(string, InputHandler.getInstance().mouseX + 5,
@@ -99,6 +129,8 @@ public class UI {
 			chopper = new Image("Data/Images/chopper.png");
 			farmer = new Image("Data/Images/farmer.png");
 			person = new Image("Data/Images/person.png");
+			stone = new Image("Data/Images/stone.png");
+			miner = new Image("Data/Images/miner.png");
 		} catch(SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -29,6 +29,10 @@ public class Village {
 		return instance;
 	}
 
+	private Image bridge;
+
+	private Image[] bridgeIncomplete;
+
 	private int builders;
 
 	private List<Building> buildings;
@@ -38,19 +42,25 @@ public class Village {
 	private Building center;
 
 	private Image farm;
-
 	private int farmers;
 
 	private Image[] farmIncomplete;
 	private int food = 100;
 
 	private int lastUpdate = 0;
+	private Image mine;
+
+	private Image[] mineIncomplete;
+	private int miners = 0;
 	private List<Person> population;
 
 	private Image smallHut;
+
 	private Image[] smallHutIncomplete;
 
+	private int stone = 0;
 	private Image villageCenter;
+
 	private int wood = 100;
 	private Image woodcutter;
 
@@ -73,8 +83,16 @@ public class Village {
 		food += n;
 	}
 
+	public void addMiner(int i) {
+		miners += i;
+	}
+
 	public void addPerson(Person p) {
 		population.add(p);
+	}
+
+	public void addStone(int n) {
+		stone += n;
 	}
 
 	public void addWood(int n) {
@@ -85,10 +103,36 @@ public class Village {
 		woodcutters += n;
 	}
 
+	private boolean constructBridge(int area) {
+		BuildingSpot spot = findFreeSpot(area, 2);
+		if(spot == null) {
+			return false;
+		}
+
+		Building b = new Building(spot.x, spot.y, spot.rotation, bridge);
+		b.setIncompleteImages(bridgeIncomplete);
+		b.setConstructionCost(20);
+		b.setMaterials(0);
+		b.setRole(Role.BRIDGE);
+
+		buildings.add(b);
+
+		buildingSpots.remove(spot);
+		findFreeSpot(area, 2);
+		return true;
+	}
+
 	public boolean constructBuilding(int area, int size) {
 		if(area == -1) {
 			return false;
 		}
+		if(Map.getInstance().getBlocked(area)) {
+			return false;
+		}
+		/*
+		 * 0 - plains 1 - forest 2 - field 3 - mountain 4 - hill 5 - river 6 -
+		 * gold
+		 */
 		switch(Map.getInstance().getType()) {
 			case 0:
 				return constructHut(area, size);
@@ -96,6 +140,10 @@ public class Village {
 				return constructWoodcutter(area);
 			case 2:
 				return constructFarm(area);
+			case 3:
+				return constructMine(area);
+			case 5:
+				return constructBridge(area);
 			default:
 				return false;
 		}
@@ -116,6 +164,7 @@ public class Village {
 		buildings.add(b);
 
 		buildingSpots.remove(spot);
+		findFreeSpot(area, 2);
 		return true;
 	}
 
@@ -134,6 +183,26 @@ public class Village {
 		buildings.add(b);
 
 		buildingSpots.remove(spot);
+		findFreeSpot(area, size);
+		return true;
+	}
+
+	private boolean constructMine(int area) {
+		BuildingSpot spot = findFreeSpot(area, 1);
+		if(spot == null) {
+			return false;
+		}
+
+		Building b = new Building(spot.x, spot.y, spot.rotation, mine);
+		b.setIncompleteImages(mineIncomplete);
+		b.setConstructionCost(10);
+		b.setMaterials(0);
+		b.setRole(Role.MINER);
+
+		buildings.add(b);
+
+		buildingSpots.remove(spot);
+		findFreeSpot(area, 1);
 		return true;
 	}
 
@@ -170,6 +239,7 @@ public class Village {
 		buildings.add(b);
 
 		buildingSpots.remove(spot);
+		findFreeSpot(area, 1);
 		return true;
 	}
 
@@ -192,6 +262,8 @@ public class Village {
 		if(spots.size() > 0) {
 			return spots.get((int)(Math.random() * spots.size()));
 		}
+		Map.getInstance().setFull(area); // assumes some things about the
+											// size
 		return null;
 	}
 
@@ -211,8 +283,16 @@ public class Village {
 		return food;
 	}
 
+	public int getMiners() {
+		return miners;
+	}
+
 	public int getPopulation() {
-		return builders + woodcutters + farmers;
+		return builders + woodcutters + farmers + miners;
+	}
+
+	public int getStone() {
+		return stone;
 	}
 
 	public int getWood() {
@@ -246,6 +326,19 @@ public class Village {
 		farmIncomplete[2] = new Image("Data/Images/farm/farm2.png");
 		farmIncomplete[3] = new Image("Data/Images/farm/farm3.png");
 		farmIncomplete[4] = new Image("Data/Images/farm/farm4.png");
+
+		mine = new Image("Data/Images/mine.png");
+		mineIncomplete = new Image[3];
+		mineIncomplete[0] = new Image("Data/Images/mine/mine0.png");
+		mineIncomplete[1] = new Image("Data/Images/mine/mine1.png");
+		mineIncomplete[2] = new Image("Data/Images/mine/mine2.png");
+
+		bridge = new Image("Data/Images/bridge.png");
+		bridgeIncomplete = new Image[4];
+		bridgeIncomplete[0] = new Image("Data/Images/bridge/bridge0.png");
+		bridgeIncomplete[1] = new Image("Data/Images/bridge/bridge1.png");
+		bridgeIncomplete[2] = new Image("Data/Images/bridge/bridge2.png");
+		bridgeIncomplete[3] = new Image("Data/Images/bridge/bridge3.png");
 
 		villageCenter = new Image("Data/villageCenter.png");
 
@@ -317,6 +410,9 @@ public class Village {
 					break;
 				case FARMER:
 					personToRemove.getHome().addFarmer(1);
+					break;
+				case MINER:
+					personToRemove.getHome().addMiner(1);
 					break;
 			}
 			population.remove(personToRemove);

@@ -2,10 +2,13 @@ package ld26.village;
 
 import ld26.ai.BuildJob;
 import ld26.ai.DeliverFoodJob;
+import ld26.ai.DeliverStoneJob;
 import ld26.ai.DeliverWoodJob;
 import ld26.ai.GetMaterialsJob;
 import ld26.ai.GoHomeJob;
+import ld26.ai.VillagerPathfinding;
 import ld26.ai.Waypoint;
+import ld26.map.Map;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -22,6 +25,8 @@ public class Building {
 	private int materials;
 
 	private int materialsReserved = 0;
+
+	private int miners = 0;
 
 	private Role role;
 
@@ -86,8 +91,19 @@ public class Building {
 					farmers += 5;
 					Village.getInstance().addFarmer(5);
 					break;
+				case MINER:
+					miners += 5;
+					Village.getInstance().addMiner(5);
+					break;
+				case BRIDGE:
+					Map.getInstance().accessRight();
+					break;
 			}
 		}
+	}
+
+	public void addMiner(int i) {
+		miners += i;
 	}
 
 	public void addWoodcutter(int i) {
@@ -182,6 +198,24 @@ public class Building {
 
 	public void setRole(Role role) {
 		this.role = role;
+		if(role == Role.BRIDGE) {
+			for(int i = 0; i < image.getWidth(); i++) {
+				for(int j = 0; j < image.getHeight(); j++) {
+					if(image.getColor(i, j).getAlpha() > 0) {
+						int oldX = i - image.getWidth() / 2;
+						int oldY = j - image.getHeight() / 2;
+
+						double newX = oldX * Math.cos(rotation) - oldY
+								* Math.sin(rotation);
+						double newY = oldX * Math.sin(rotation) + oldY
+								* Math.cos(rotation);
+
+						VillagerPathfinding.getInstance().setUnblocked(
+								(int)(x + newX), (int)(y + newY));
+					}
+				}
+			}
+		}
 	}
 
 	public void setUnreachable(boolean unreachable) {
@@ -230,6 +264,22 @@ public class Building {
 		}
 	}
 
+	private void spawnMiner() {
+		if(spawnCounter <= 0 && miners > 0
+				&& Village.getInstance().getFood() > 0) {
+			Village.getInstance().addFood(-1);
+			spawnCounter = Village.SPAWN_DELAY;
+			miners--;
+			Person p = new Person(this);
+			p.addWaypoint(new Waypoint(Village.getInstance().getCenter(),
+					new DeliverStoneJob(p)));
+			p.addWaypoint(new Waypoint(this, new GoHomeJob(p)));
+			p.setRole(Role.MINER);
+			Village.getInstance().addPerson(p);
+			p.startRoute();
+		}
+	}
+
 	private void spawnWoodcutter() {
 		if(spawnCounter <= 0 && woodcutters > 0
 				&& Village.getInstance().getFood() > 0) {
@@ -259,6 +309,9 @@ public class Building {
 					break;
 				case FARMER:
 					spawnFarmer();
+					break;
+				case MINER:
+					spawnMiner();
 					break;
 			}
 		}

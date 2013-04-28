@@ -5,6 +5,7 @@ import ld26.village.Village;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.state.StateBasedGame;
 
 public class InputHandler {
 	private static InputHandler instance;
@@ -21,19 +22,21 @@ public class InputHandler {
 
 	public int mouseY = 0;
 
+	private boolean paused = false;
+
 	private InputHandler() {
 
 	}
 
-	public void handleInput(GameContainer container) {
+	public void handleInput(GameContainer container, StateBasedGame sbg) {
 		input = container.getInput();
 		showSelections(container);
 		mouseClick();
-		keyboard();
+		keyboard(sbg);
 	}
 
-	private void keyboard() {
-		if(input.isKeyPressed(Input.KEY_SPACE)) { // remove for release
+	private void keyboard(StateBasedGame sbg) {
+		if(input.isKeyPressed(Input.KEY_C)) { // remove for release
 			if(Village.SPAWN_DELAY > 0) {
 				Village.SPAWN_DELAY = 0;
 				Village.VILLAGER_SPEED = 10;
@@ -42,15 +45,28 @@ public class InputHandler {
 				Village.VILLAGER_SPEED = 50;
 			}
 		}
+		if(input.isKeyPressed(Input.KEY_W)) {
+			Village.getInstance().addWood(100);
+		}
+		if(input.isKeyPressed(Input.KEY_F)) {
+			Village.getInstance().addFood(100);
+		}
+		// if(input.isKeyPressed(Input.KEY_SPACE)) {
+		// if(!paused) {
+		// sbg.pauseUpdate();
+		// } else {
+		// sbg.unpauseUpdate();
+		// }
+		// }
+		if(input.isKeyPressed(Input.KEY_ESCAPE)) {
+			sbg.enterState(0);
+		}
 	}
 
 	private void mouseClick() {
 		if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-			boolean success = Village.getInstance().constructBuilding(
+			Village.getInstance().constructBuilding(
 					Map.getInstance().getSelectedArea(), 0);
-			if(!success) {
-				Map.getInstance().setFull(Map.getInstance().getSelectedArea());
-			}
 		}
 	}
 
