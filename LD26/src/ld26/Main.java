@@ -14,10 +14,6 @@ import org.newdawn.slick.SlickException;
 
 public class Main extends BasicGame {
 
-	public Main() {
-		super("LD26");
-	}
-
 	public static void main(String[] args) {
 		try {
 			AppGameContainer container = new AppGameContainer(new Main());
@@ -27,6 +23,22 @@ public class Main extends BasicGame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public Main() {
+		super("LD26");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.newdawn.slick.BasicGame#init(org.newdawn.slick.GameContainer)
+	 */
+	@Override
+	public void init(GameContainer arg0) throws SlickException {
+		Map.getInstance().init();
+		VillagerPathfinding.getInstance().init();
+		Village.getInstance().init();
+		UI.init();
 	}
 
 	/*
@@ -42,17 +54,6 @@ public class Main extends BasicGame {
 		// VillagerPathfinding.getInstance().drawBlockMap(g);
 
 		UI.draw(g);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.newdawn.slick.BasicGame#init(org.newdawn.slick.GameContainer)
-	 */
-	@Override
-	public void init(GameContainer arg0) throws SlickException {
-		Map.getInstance().init();
-		VillagerPathfinding.getInstance().init();
-		Village.getInstance().init();
 	}
 
 	/*

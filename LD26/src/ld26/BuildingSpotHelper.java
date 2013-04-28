@@ -19,21 +19,58 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class BuildingSpotHelper extends BasicGame {
-	private Image				smallTemplate;
-	private Image				mediumTemplate;
-	private Image				largeTemplate;
-
-	private List<BuildingSpot>	buildingSpots;
-
-	public BuildingSpotHelper() {
-		super("Building Spot Placement");
-	}
-
 	public static void main(String[] args) throws SlickException {
 		AppGameContainer container = new AppGameContainer(
 				new BuildingSpotHelper());
 		container.setDisplayMode(1024, 768, false);
 		container.start();
+	}
+
+	private int area = -1;
+	private List<BuildingSpot> buildingSpots;
+
+	private boolean drawing = false;
+
+	private int endX = 0;
+
+	private int endY = 0;
+
+	private Image largeTemplate;
+
+	private Image mediumTemplate;
+
+	private int mouseX = 0;
+
+	private int mouseY = 0;
+
+	private File output;
+
+	private int size = 0;
+
+	private Image smallTemplate;
+	private int startX = 0;
+	private int startY = 0;
+
+	public BuildingSpotHelper() {
+		super("Building Spot Placement");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.newdawn.slick.BasicGame#init(org.newdawn.slick.GameContainer)
+	 */
+	@Override
+	public void init(GameContainer arg0) throws SlickException {
+		buildingSpots = new ArrayList<>();
+		Map.getInstance().init();
+		Map.getInstance().setImage(
+				new Image("Data/Images/selectionCircles.jpg"));
+		smallTemplate = new Image("Data/smallTemplate.png");
+		mediumTemplate = new Image("Data/mediumTemplate.png");
+		largeTemplate = new Image("Data/largeTemplate.png");
+		smallTemplate.setCenterOfRotation(5, 5);
+		mediumTemplate.setCenterOfRotation(7, 7);
+		largeTemplate.setCenterOfRotation(10, 10);
 	}
 
 	/*
@@ -61,6 +98,33 @@ public class BuildingSpotHelper extends BasicGame {
 		}
 	}
 
+	private void saveSpots() {
+		File dataDir = new File("Data/Spots");
+		if(output == null) {
+			String[] files = dataDir.list(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String name) {
+					return name.matches("spots\\d\\.txt");
+				}
+			});
+			output = new File(dataDir, "spots" + files.length + ".txt");
+		}
+		try {
+			PrintWriter out = new PrintWriter(output);
+			out.println(buildingSpots.size());
+			for(BuildingSpot spot : buildingSpots) {
+				out.println(spot.toString());
+			}
+			out.close();
+			System.out.println("Wrote " + buildingSpots.size() + " spots to "
+					+ output.getPath());
+		} catch(FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private Image sizeToImage(int size) {
 		switch(size) {
 			case 0:
@@ -70,22 +134,6 @@ public class BuildingSpotHelper extends BasicGame {
 			default:
 				return largeTemplate;
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.newdawn.slick.BasicGame#init(org.newdawn.slick.GameContainer)
-	 */
-	@Override
-	public void init(GameContainer arg0) throws SlickException {
-		buildingSpots = new ArrayList<>();
-		Map.getInstance().init();
-		smallTemplate = new Image("Data/smallTemplate.png");
-		mediumTemplate = new Image("Data/mediumTemplate.png");
-		largeTemplate = new Image("Data/largeTemplate.png");
-		smallTemplate.setCenterOfRotation(5, 5);
-		mediumTemplate.setCenterOfRotation(7, 7);
-		largeTemplate.setCenterOfRotation(10, 10);
 	}
 
 	/*
@@ -142,45 +190,5 @@ public class BuildingSpotHelper extends BasicGame {
 			saveSpots();
 		}
 	}
-
-	private File	output;
-
-	private void saveSpots() {
-		File dataDir = new File("Data/Spots");
-		if(output == null) {
-			String[] files = dataDir.list(new FilenameFilter() {
-
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.matches("spots\\d\\.txt");
-				}
-			});
-			output = new File(dataDir, "spots" + files.length + ".txt");
-		}
-		try {
-			PrintWriter out = new PrintWriter(output);
-			out.println(buildingSpots.size());
-			for(BuildingSpot spot : buildingSpots) {
-				out.println(spot.toString());
-			}
-			out.close();
-			System.out.println("Wrote " + buildingSpots.size() + " spots to "
-					+ output.getPath());
-		} catch(FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private int		area	= -1;
-	private int		mouseX	= 0;
-	private int		mouseY	= 0;
-	private int		size	= 0;
-	private int		startX	= 0;
-	private int		startY	= 0;
-	private int		endX	= 0;
-	private int		endY	= 0;
-
-	private boolean	drawing	= false;
 
 }
