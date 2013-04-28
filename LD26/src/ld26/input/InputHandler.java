@@ -46,8 +46,11 @@ public class InputHandler {
 
 	private void mouseClick() {
 		if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-			Village.getInstance().constructBuilding(
+			boolean success = Village.getInstance().constructBuilding(
 					Map.getInstance().getSelectedArea(), 0);
+			if(!success) {
+				Map.getInstance().setFull(Map.getInstance().getSelectedArea());
+			}
 		}
 	}
 

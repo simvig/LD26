@@ -7,6 +7,8 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class Map {
+	public static final int AREAS = 8;
+
 	private static Map instance;
 
 	public static Map getInstance() {
@@ -16,12 +18,15 @@ public class Map {
 		return instance;
 	}
 
-	private Image mapImage;
 	// private int numAreas;
 
+	private boolean[] isFull = new boolean[AREAS];
+	private Image mapImage;
+
 	private int selectedArea = -1;
-	private int selectedAreaType = -1;
 	// private Image[] selectionCircles;
+
+	private int selectedAreaType = -1;
 
 	private Image selectionMask;
 
@@ -42,6 +47,7 @@ public class Map {
 
 	public void draw(GameContainer container, Graphics g) {
 		mapImage.draw();
+		Roads.draw();
 		// if(selectedArea >= 0 && selectedArea < selectionCircles.length) {
 		// //selectionCircles[selectedArea].draw();
 		// }
@@ -51,6 +57,10 @@ public class Map {
 		// for(int i = 0; i < numAreas; i++) {
 		// //selectionCircles[i].draw();
 		// }
+	}
+
+	public boolean getFull(int area) {
+		return isFull[area];
 	}
 
 	public int getSelectedArea() {
@@ -65,6 +75,7 @@ public class Map {
 		try {
 			mapImage = new Image("Data/Images/map.jpg");
 			selectionMask = new Image("Data/Images/selectionMask.png");
+			Roads.init();
 
 			// File dataDir = new File("Data");
 			// String[] files = dataDir.list(new FilenameFilter() {
@@ -86,6 +97,10 @@ public class Map {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void setFull(int area) {
+		isFull[area] = true;
 	}
 
 	public void setImage(Image image) {

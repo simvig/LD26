@@ -6,6 +6,7 @@ import java.util.List;
 import ld26.ai.Job;
 import ld26.ai.VillagerPathfinding;
 import ld26.ai.Waypoint;
+import ld26.map.Roads;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.util.pathfinding.Path;
@@ -109,6 +110,7 @@ public class Person {
 			if(index < path.getLength()) {
 				x = path.getX(index);
 				y = path.getY(index);
+				Roads.advanceRoad(x, y);
 				index++;
 			} else {
 				waypoints.get(routeIndex).getJob().doJob();
