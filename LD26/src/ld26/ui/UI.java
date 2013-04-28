@@ -1,5 +1,6 @@
 package ld26.ui;
 
+import ld26.Main;
 import ld26.input.InputHandler;
 import ld26.map.Map;
 import ld26.village.Village;
@@ -15,16 +16,25 @@ public class UI {
 	private static Image farmer;
 	private static Image food;
 	private static Image miner;
+	private static Image paused;
 	private static Image person;
 	private static Image stone;
 	private static Image tooltip;
 	private static Image wine;
 	private static Image winemaker;
+
 	private static Image wood;
 
 	public static void draw(Graphics g) {
 		drawCounts(g);
-		drawTooltip(g);
+		if(!Main.statePaused && Main.message == null) {
+			drawTooltip(g);
+		} else {
+			paused.draw(1024 / 2 - 50, 768 / 2 - 10);
+		}
+		if(Main.message != null) {
+			Main.message.draw();
+		}
 	}
 
 	private static void drawCounts(Graphics g) {
@@ -145,6 +155,8 @@ public class UI {
 			miner = new Image("Data/Images/miner.png");
 			wine = new Image("Data/Images/wine.png");
 			winemaker = new Image("Data/Images/winemaker.png");
+
+			paused = new Image("Data/images/paused.jpg");
 		} catch(SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

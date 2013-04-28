@@ -1,5 +1,6 @@
 package ld26.input;
 
+import ld26.Main;
 import ld26.map.Map;
 import ld26.village.Village;
 
@@ -21,8 +22,6 @@ public class InputHandler {
 	public int mouseX = 0;
 
 	public int mouseY = 0;
-
-	private boolean paused = false;
 
 	private InputHandler() {
 
@@ -51,13 +50,9 @@ public class InputHandler {
 		if(input.isKeyPressed(Input.KEY_F)) {
 			Village.getInstance().addFood(100);
 		}
-		// if(input.isKeyPressed(Input.KEY_SPACE)) {
-		// if(!paused) {
-		// sbg.pauseUpdate();
-		// } else {
-		// sbg.unpauseUpdate();
-		// }
-		// }
+		if(input.isKeyPressed(Input.KEY_SPACE)) {
+			Main.statePaused = !Main.statePaused;
+		}
 		if(input.isKeyPressed(Input.KEY_ESCAPE)) {
 			sbg.enterState(0);
 		}

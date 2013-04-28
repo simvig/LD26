@@ -56,8 +56,14 @@ public class GameState extends BasicGameState {
 	@Override
 	public void update(GameContainer container, StateBasedGame sbg, int delta)
 			throws SlickException {
-		InputHandler.getInstance().handleInput(container, sbg);
+		if(Main.message == null) {
+			InputHandler.getInstance().handleInput(container, sbg);
+		} else {
+			Main.message.handleInput(container.getInput(), sbg);
+		}
 
-		Village.getInstance().update(delta);
+		if(!Main.statePaused && Main.message == null) {
+			Village.getInstance().update(delta);
+		}
 	}
 }

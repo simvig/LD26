@@ -106,6 +106,10 @@ public class Map {
 			// on the island
 			isBlocked[9] = true;
 
+			// river
+			isBlocked[18] = true;
+			isBlocked[19] = true;
+
 		} catch(SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -122,5 +126,9 @@ public class Map {
 
 	public void setImage(Image image) {
 		mapImage = image;
+	}
+
+	public void setUnblocked(int n) {
+		isBlocked[n] = false;
 	}
 }

@@ -1,5 +1,6 @@
 package ld26.village;
 
+import ld26.Main;
 import ld26.ai.BuildJob;
 import ld26.ai.DeliverFoodJob;
 import ld26.ai.DeliverStoneJob;
@@ -10,19 +11,23 @@ import ld26.ai.GoHomeJob;
 import ld26.ai.VillagerPathfinding;
 import ld26.ai.Waypoint;
 import ld26.map.Map;
+import ld26.ui.Message;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 public class Building {
+
+	private static int mediumHuts = 0;
 
 	private int builders = 0;
 
 	private int constructionCost;
-
 	private int farmers = 0;
 	private Image image;
 	private Image[] incompleteImages;
+
 	private int materials;
 
 	private int materialsReserved = 0;
@@ -36,8 +41,8 @@ public class Building {
 	public int size = 0;
 
 	private int spawnCounter = Village.SPAWN_DELAY;
-
 	public int spotSize = 0;
+
 	private boolean unreachable;
 
 	private int winemakers = 0;
@@ -88,6 +93,22 @@ public class Building {
 				case BUILDER:
 					builders += size + 1;
 					Village.getInstance().addBuilder(size + 1);
+
+					if(size == 1) {
+						mediumHuts++;
+						if(mediumHuts == 5) {
+							try {
+								Main.message = new Message(new Image(
+										"Data/Images/bridgeBuilding.jpg"));
+								Map.getInstance().setUnblocked(18);
+								Map.getInstance().setUnblocked(19);
+							} catch(SlickException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}
+
 					break;
 				case WOODCUTTER:
 					woodcutters += 3;

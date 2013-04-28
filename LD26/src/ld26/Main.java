@@ -1,11 +1,16 @@
 package ld26;
 
+import ld26.ui.Message;
+
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
 public class Main extends StateBasedGame {
+
+	public static Message message = null;
+	public static boolean statePaused = false;
 
 	public static void main(String[] args) {
 		try {
