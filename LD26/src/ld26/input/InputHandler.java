@@ -6,6 +6,7 @@ import ld26.village.Village;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
 public class InputHandler {
@@ -31,10 +32,10 @@ public class InputHandler {
 		input = container.getInput();
 		showSelections(container);
 		mouseClick();
-		keyboard(sbg);
+		keyboard(container, sbg);
 	}
 
-	private void keyboard(StateBasedGame sbg) {
+	private void keyboard(GameContainer container, StateBasedGame sbg) {
 		// if(input.isKeyPressed(Input.KEY_C)) { // remove for release
 		// if(Village.SPAWN_DELAY > 0) {
 		// Village.SPAWN_DELAY = 0;
@@ -65,6 +66,16 @@ public class InputHandler {
 		}
 		if(input.isKeyPressed(Input.KEY_ESCAPE)) {
 			sbg.enterState(0);
+		}
+
+		if(input.isKeyPressed(Input.KEY_F)) {
+			boolean fullScreen = container.isFullscreen();
+			try {
+				container.setFullscreen(!fullScreen);
+			} catch(SlickException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

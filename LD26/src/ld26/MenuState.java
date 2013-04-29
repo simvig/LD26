@@ -119,6 +119,15 @@ public class MenuState extends BasicGameState {
 				input.resume();
 			}
 		}
+		if(input.isKeyPressed(Input.KEY_F)) {
+			boolean fullScreen = gc.isFullscreen();
+			try {
+				gc.setFullscreen(!fullScreen);
+			} catch(SlickException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

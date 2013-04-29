@@ -66,7 +66,7 @@ public class GameState extends BasicGameState {
 		if(Main.message == null) {
 			InputHandler.getInstance().handleInput(container, sbg);
 		} else {
-			Main.message.handleInput(container.getInput(), sbg);
+			Main.message.handleInput(container, container.getInput(), sbg);
 		}
 
 		if(!Main.statePaused && Main.message == null) {
