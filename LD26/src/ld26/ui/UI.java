@@ -15,6 +15,8 @@ public class UI {
 	private static Image chopper;
 	private static Image farmer;
 	private static Image food;
+	private static Image gold;
+	private static Image goldMiner;
 	private static Image miner;
 	private static Image paused;
 	private static Image person;
@@ -45,11 +47,13 @@ public class UI {
 
 		miner.draw(502, 672);
 		winemaker.draw(502, 692);
+		goldMiner.draw(502, 712);
 
 		wood.draw(652, 672);
 		food.draw(652, 692);
-		stone.draw(652, 712);
-		wine.draw(652, 732);
+		stone.draw(722, 672);
+		wine.draw(722, 692);
+		gold.draw(687, 732);
 
 		g.drawString("" + Village.getInstance().getBuilders(), 420, 670);
 		g.drawString("" + Village.getInstance().getWoodcutters(), 420, 690);
@@ -58,11 +62,13 @@ public class UI {
 
 		g.drawString("" + Village.getInstance().getMiners(), 520, 670);
 		g.drawString("" + Village.getInstance().getWinemakers(), 520, 690);
+		g.drawString("" + Village.getInstance().getGoldMiners(), 520, 710);
 
 		g.drawString("" + Village.getInstance().getWood(), 670, 670);
 		g.drawString("" + Village.getInstance().getFood(), 670, 690);
-		g.drawString("" + Village.getInstance().getStone(), 670, 710);
-		g.drawString("" + Village.getInstance().getWine(), 670, 730);
+		g.drawString("" + Village.getInstance().getStone(), 742, 670);
+		g.drawString("" + Village.getInstance().getWine(), 742, 690);
+		g.drawString("" + Village.getInstance().getGold(), 705, 730);
 	}
 
 	private static void drawTooltip(Graphics g) {
@@ -116,6 +122,12 @@ public class UI {
 							color = Color.red;
 						}
 						break;
+					case 6:
+						string = "Build Gold Mine 50";
+						if(Village.getInstance().getWood() < 50) {
+							color = Color.red;
+						}
+						break;
 					default:
 						return;
 				}
@@ -124,18 +136,23 @@ public class UI {
 				color = Color.yellow;
 				string = "Area Inaccessible";
 			}
-			tooltip.draw(InputHandler.getInstance().mouseX,
-					InputHandler.getInstance().mouseY - 20,
-					10 * string.length() + 20, 20);
+
+			int width = 10 * string.length() + 20;
+			int dx = 0;
+			if(InputHandler.getInstance().mouseX > 1024 - width) {
+				dx -= width;
+			}
+			tooltip.draw(InputHandler.getInstance().mouseX + dx,
+					InputHandler.getInstance().mouseY - 20, width, 20);
 			if(drawWood) {
 				wood.draw(
 						InputHandler.getInstance().mouseX + 9.7f
-								* string.length(),
+								* string.length() + dx,
 						InputHandler.getInstance().mouseY - 18);
 			}
 
 			g.setColor(color);
-			g.drawString(string, InputHandler.getInstance().mouseX + 5,
+			g.drawString(string, InputHandler.getInstance().mouseX + 5 + dx,
 					InputHandler.getInstance().mouseY - 20);
 
 			g.setColor(Color.white);
@@ -155,6 +172,8 @@ public class UI {
 			miner = new Image("Data/Images/miner.png");
 			wine = new Image("Data/Images/wine.png");
 			winemaker = new Image("Data/Images/winemaker.png");
+			gold = new Image("Data/Images/gold.png");
+			goldMiner = new Image("Data/Images/goldMiner.png");
 
 			paused = new Image("Data/images/paused.jpg");
 		} catch(SlickException e) {

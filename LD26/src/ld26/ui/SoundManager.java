@@ -45,37 +45,37 @@ public class SoundManager {
 	}
 
 	public static void playBuild() {
-		if(Math.random() < 0.1) {
+		if(Math.random() < 0.05) {
 			buildSound[(int)(Math.random() * 3)].play();
 		}
 	}
 
 	public static void playChop() {
-		if(Math.random() < 0.1) {
+		if(Math.random() < 0.05) {
 			chopSound[(int)(Math.random() * 3)].play();
 		}
 	}
 
 	public static void playFood() {
-		if(Math.random() < 0.1) {
+		if(Math.random() < 0.05) {
 			foodSound[(int)(Math.random() * 3)].play();
 		}
 	}
 
 	public static void playGold() {
-		if(Math.random() < 0.1) {
+		if(Math.random() < 0.05) {
 			goldSound[(int)(Math.random() * 3)].play();
 		}
 	}
 
 	public static void playMine() {
-		if(Math.random() < 0.1) {
+		if(Math.random() < 0.05) {
 			mineSound[(int)(Math.random() * 3)].play();
 		}
 	}
 
 	public static void playWine() {
-		if(Math.random() < 0.1) {
+		if(Math.random() < 0.05) {
 			wineSound[(int)(Math.random() * 3)].play();
 		}
 	}

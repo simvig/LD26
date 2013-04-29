@@ -16,6 +16,8 @@ public class Main extends StateBasedGame {
 		try {
 			AppGameContainer container = new AppGameContainer(new Main());
 			container.setDisplayMode(1024, 768, false);
+			container.setShowFPS(false);
+			container.setIcon("Data/Images/icon.png");
 			container.start();
 		} catch(SlickException e) {
 			// TODO Auto-generated catch block
@@ -24,13 +26,23 @@ public class Main extends StateBasedGame {
 	}
 
 	public Main() {
-		super("LD26");
+		super("Ville");
 
 		addState(new MenuState());
 		addState(new GameState());
 
 		enterState(0);
 	}
+
+	// @Override
+	// public void enterState(int i) {
+	// super.enterState(i);
+	//
+	// if(i == 1 && !MenuState.newGameStarted) {
+	// MenuState.newGameStarted = true;
+	//
+	// }
+	// }
 
 	/*
 	 * (non-Javadoc)

@@ -10,19 +10,21 @@ import org.newdawn.slick.state.StateBasedGame;
 
 public class MenuState extends BasicGameState {
 
+	public static int inputDelay = 0;
+	public static boolean newGameStarted = false;
 	private Image background;
 	private Image cont;
 	private Image contSelected;
 	private Image exit;
 	private boolean exitOver = false;
+
 	private Image exitSelected;
+
 	private Image newGame;
 
 	private boolean newGameOver = false;
 
 	private Image newGameSelected;
-
-	private boolean newGameStarted = false;
 
 	/*
 	 * (non-Javadoc)
@@ -89,8 +91,9 @@ public class MenuState extends BasicGameState {
 	 * org.newdawn.slick.state.StateBasedGame, int)
 	 */
 	@Override
-	public void update(GameContainer gc, StateBasedGame sbg, int arg2)
+	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
+		inputDelay -= delta;
 		Input input = gc.getInput();
 		int x = input.getMouseX();
 		int y = input.getMouseY();
@@ -107,11 +110,10 @@ public class MenuState extends BasicGameState {
 			exitOver = false;
 		}
 
-		if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+		if(inputDelay < 0 && input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
 			if(exitOver) {
 				gc.exit();
 			} else if(newGameOver) {
-				newGameStarted = true;
 				input.pause();
 				sbg.enterState(1);
 				input.resume();

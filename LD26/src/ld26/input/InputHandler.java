@@ -35,21 +35,31 @@ public class InputHandler {
 	}
 
 	private void keyboard(StateBasedGame sbg) {
-		if(input.isKeyPressed(Input.KEY_C)) { // remove for release
-			if(Village.SPAWN_DELAY > 0) {
-				Village.SPAWN_DELAY = 0;
-				Village.VILLAGER_SPEED = 10;
-			} else {
-				Village.SPAWN_DELAY = 500;
-				Village.VILLAGER_SPEED = 50;
-			}
-		}
-		if(input.isKeyPressed(Input.KEY_W)) {
-			Village.getInstance().addWood(100);
-		}
-		if(input.isKeyPressed(Input.KEY_F)) {
-			Village.getInstance().addFood(100);
-		}
+		// if(input.isKeyPressed(Input.KEY_C)) { // remove for release
+		// if(Village.SPAWN_DELAY > 0) {
+		// Village.SPAWN_DELAY = 0;
+		// Village.VILLAGER_SPEED = 10;
+		// } else {
+		// Village.SPAWN_DELAY = 500;
+		// Village.VILLAGER_SPEED = 50;
+		// }
+		// }
+		// if(input.isKeyPressed(Input.KEY_W)) {
+		// Village.getInstance().addWood(100);
+		// }
+		// if(input.isKeyPressed(Input.KEY_F)) {
+		// Village.getInstance().addFood(100);
+		// }
+		// if(input.isKeyPressed(Input.KEY_S)) {
+		// Village.getInstance().addStone(100);
+		// }
+		// if(input.isKeyPressed(Input.KEY_N)) {
+		// Village.getInstance().addWine(100);
+		// }
+		// if(input.isKeyPressed(Input.KEY_G)) {
+		// Village.getInstance().addGold(100);
+		// }
+
 		if(input.isKeyPressed(Input.KEY_SPACE)) {
 			Main.statePaused = !Main.statePaused;
 		}

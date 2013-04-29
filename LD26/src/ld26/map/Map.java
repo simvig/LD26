@@ -7,7 +7,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 public class Map {
-	public static final int AREAS = 20;
+	public static final int AREAS = 34;
 
 	private static Map instance;
 
@@ -22,7 +22,13 @@ public class Map {
 
 	private boolean[] isBlocked = new boolean[AREAS];
 	private boolean[] isFull = new boolean[AREAS];
+	public int[] islandAreas = {9, 30, 31, 32};
+
 	private Image mapImage;
+
+	public int[] rightAreas = {12, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29};
+
+	public int[] rivers = {18, 19};
 
 	private int selectedArea = -1;
 	// private Image[] selectionCircles;
@@ -36,8 +42,9 @@ public class Map {
 	}
 
 	public void accessRight() {
-		// TODO Auto-generated method stub
-
+		for(int i = 0; i < rightAreas.length; i++) {
+			isBlocked[rightAreas[i]] = false;
+		}
 	}
 
 	public void checkMouseOverArea(int mouseX, int mouseY) {
@@ -65,8 +72,21 @@ public class Map {
 		// }
 	}
 
+	public int getArea(int x, int y) {
+		Color c = selectionMask.getColor(x, y);
+		if(c.getAlpha() == 0) {
+			return -1;
+		} else {
+			return c.getRed();
+		}
+	}
+
 	public boolean getBlocked(int n) {
 		return isBlocked[n];
+	}
+
+	public int getDistance(int x1, int y1, int x2, int y2) {
+		return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
 	}
 
 	public boolean getFull(int area) {
@@ -104,16 +124,63 @@ public class Map {
 			// }
 
 			// on the island
-			isBlocked[9] = true;
+			for(int i = 0; i < islandAreas.length; i++) {
+				isBlocked[islandAreas[i]] = true;
+			}
 
 			// river
-			isBlocked[18] = true;
-			isBlocked[19] = true;
+			for(int i = 0; i < rivers.length; i++) {
+				isBlocked[rivers[i]] = true;
+			}
+
+			// right of continent
+			for(int i = 0; i < rightAreas.length; i++) {
+				isBlocked[rightAreas[i]] = true;
+			}
 
 		} catch(SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public boolean isIsland(int x, int y) {
+		int area = getArea(x, y);
+		if(area == -1) {
+			return false;
+		}
+		for(int islandArea : islandAreas) {
+			if(area == islandArea) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isLeft(int x, int y) {
+		int area = getArea(x, y);
+		if(area == -1) {
+			return false;
+		}
+		for(int rightArea : rightAreas) {
+			if(area == rightArea) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean isRight(int x, int y) {
+		int area = getArea(x, y);
+		if(area == -1) {
+			return false;
+		}
+		for(int rightArea : rightAreas) {
+			if(area == rightArea) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setBlocked(int n) {

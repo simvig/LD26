@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ld26.BuildingSpot;
+import ld26.Main;
+import ld26.ai.VillagerPathfinding;
 import ld26.map.Map;
+import ld26.ui.Message;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -19,7 +22,7 @@ public class Village {
 	private static Village instance;
 	public static int SPAWN_DELAY = 500;
 
-	public static int VILLAGER_SPEED = 50; // milliseconds
+	public static int VILLAGER_SPEED = 10; // milliseconds
 											// per pixel
 
 	public static Village getInstance() {
@@ -28,6 +31,10 @@ public class Village {
 		}
 		return instance;
 	}
+
+	private Image bigBridge;
+
+	public boolean bigBridgeBuilt = false;
 
 	private Image bridge;
 
@@ -38,7 +45,6 @@ public class Village {
 	private List<Building> buildings;
 
 	private List<BuildingSpot> buildingSpots;
-
 	private Building center;
 
 	private Image farm;
@@ -47,30 +53,43 @@ public class Village {
 	private Image[] farmIncomplete;
 	private int food = 100;
 
+	private int gold;
+	private Image goldMine;
+	private Image[] goldMineIncomplete;
+
 	private int goldMiners = 0;
+
+	private Image largeHut;
+
+	private Image[] largeHutIncomplete;
 	private int lastUpdate = 0;
 
 	private Image mediumHut;
 	private Image[] mediumHutIncomplete;
-	private Image mine;
 
+	private Image mine;
 	private Image[] mineIncomplete;
 
 	private int miners = 0;
+	public Building nearestBridge = null;
 
 	private List<Person> population;
+	public boolean secretEndingUnlocked = false;
+
 	private Image smallHut;
 
 	private Image[] smallHutIncomplete;
-	private int stone = 0;
 
+	private int stone = 0;
 	private Image villageCenter;
+
 	private int wine = 0;
 
 	private int winemakers = 0;
-	private Image winery;
 
+	private Image winery;
 	private Image[] wineryIncomplete;
+
 	private int wood = 100;
 
 	private Image woodcutter;
@@ -93,6 +112,10 @@ public class Village {
 
 	public void addFood(int n) {
 		food += n;
+	}
+
+	public void addGold(int i) {
+		gold += i;
 	}
 
 	public void addGoldMiners(int i) {
@@ -154,8 +177,8 @@ public class Village {
 			return false;
 		}
 		/*
-		 * 0 - plains 1 - forest 2 - field 3 - mountain 4 - hill 5 - river 6 -
-		 * gold
+		 * 0 - plains; 1 - forest; 2 - field; 3 - mountain; 4 - hill; 5 - river;
+		 * 6 - gold
 		 */
 		switch(Map.getInstance().getType()) {
 			case 0:
@@ -170,6 +193,19 @@ public class Village {
 				return constructWinery(area);
 			case 5:
 				return constructBridge(area);
+			case 6:
+				return constructGoldMine(area);
+			case 7:
+				if(secretEndingUnlocked) {
+					try {
+						Main.message = new Message(new Image(
+								"Data/Images/secretEnd.jpg"), true);
+					} catch(SlickException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				return false;
 			default:
 				return false;
 		}
@@ -186,6 +222,25 @@ public class Village {
 		b.setConstructionCost(20);
 		b.setMaterials(0);
 		b.setRole(Role.FARMER);
+
+		buildings.add(b);
+
+		buildingSpots.remove(spot);
+		findFreeSpot(area, 2);
+		return true;
+	}
+
+	private boolean constructGoldMine(int area) {
+		BuildingSpot spot = findFreeSpot(area, 2);
+		if(spot == null) {
+			return false;
+		}
+
+		Building b = new Building(spot.x, spot.y, spot.rotation, goldMine);
+		b.setIncompleteImages(goldMineIncomplete);
+		b.setConstructionCost(50);
+		b.setMaterials(0);
+		b.setRole(Role.DIGGER);
 
 		buildings.add(b);
 
@@ -226,6 +281,7 @@ public class Village {
 		b.setConstructionCost(10);
 		b.setMaterials(0);
 		b.setRole(Role.MINER);
+		b.spotSize = spot.size;
 
 		buildings.add(b);
 
@@ -291,6 +347,9 @@ public class Village {
 	}
 
 	public void draw(Graphics g) {
+		if(bigBridgeBuilt) {
+			bigBridge.draw();
+		}
 		for(Person p : population) {
 			p.draw(g);
 		}
@@ -330,6 +389,10 @@ public class Village {
 		return food;
 	}
 
+	public int getGold() {
+		return gold;
+	}
+
 	public int getGoldMiners() {
 		return goldMiners;
 	}
@@ -367,7 +430,7 @@ public class Village {
 		loadBuildingSpots();
 		buildings = new ArrayList<>();
 
-		smallHut = new Image("Data/smallHut.png");
+		smallHut = new Image("Data/Images/smallHut.png");
 		smallHutIncomplete = new Image[2];
 		smallHutIncomplete[0] = new Image("Data/Images/smallHut/smallHut0.png");
 		smallHutIncomplete[1] = new Image("Data/Images/smallHut/smallHut1.png");
@@ -386,6 +449,14 @@ public class Village {
 		farmIncomplete[2] = new Image("Data/Images/farm/farm2.png");
 		farmIncomplete[3] = new Image("Data/Images/farm/farm3.png");
 		farmIncomplete[4] = new Image("Data/Images/farm/farm4.png");
+
+		largeHut = new Image("Data/Images/largeHut.png");
+		largeHutIncomplete = new Image[5];
+		largeHutIncomplete[0] = new Image("Data/Images/largeHut/largeHut0.png");
+		largeHutIncomplete[1] = new Image("Data/Images/largeHut/largeHut1.png");
+		largeHutIncomplete[2] = new Image("Data/Images/largeHut/largeHut2.png");
+		largeHutIncomplete[3] = new Image("Data/Images/largeHut/largeHut3.png");
+		largeHutIncomplete[4] = new Image("Data/Images/largeHut/largeHut4.png");
 
 		mine = new Image("Data/Images/mine.png");
 		mineIncomplete = new Image[3];
@@ -416,7 +487,15 @@ public class Village {
 		mediumHutIncomplete[3] = new Image(
 				"Data/Images/mediumHut/mediumHut3.png");
 
-		villageCenter = new Image("Data/villageCenter.png");
+		goldMine = new Image("Data/Images/goldMine.png");
+		goldMineIncomplete = new Image[3];
+		goldMineIncomplete[0] = new Image("Data/Images/goldMine/goldMine0.png");
+		goldMineIncomplete[1] = new Image("Data/Images/goldMine/goldMine1.png");
+		goldMineIncomplete[2] = new Image("Data/Images/goldMine/goldMine2.png");
+
+		villageCenter = new Image("Data/Images/villageCenter.png");
+
+		bigBridge = new Image("Data/Images/bigBridge.png");
 
 		population = new ArrayList<>();
 
@@ -466,6 +545,9 @@ public class Village {
 		if(stone >= 20 && wine >= 20) {
 			upgradeToMedium();
 		}
+		if(stone >= 20 && wine >= 20 && gold >= 10) {
+			upgradeToLarge();
+		}
 
 		for(Building b : buildings) {
 			b.update(delta);
@@ -497,6 +579,9 @@ public class Village {
 				case WINEMAKER:
 					personToRemove.getHome().addWinemaker(1);
 					break;
+				case DIGGER:
+					personToRemove.getHome().addGoldMiner(1);
+					break;
 			}
 			population.remove(personToRemove);
 		}
@@ -508,9 +593,39 @@ public class Village {
 		}
 	}
 
+	public void updatePathfinding() {
+		for(int i = 0; i < bigBridge.getWidth(); i++) {
+			for(int j = 0; j < bigBridge.getHeight(); j++) {
+				org.newdawn.slick.Color c = bigBridge.getColor(i, j);
+				if(c.getAlpha() > 0) {
+					VillagerPathfinding.getInstance().setUnblocked(i, j);
+				}
+			}
+		}
+	}
+
+	private void upgradeToLarge() {
+		for(Building b : buildings) {
+			if(b.getRole() == Role.BUILDER && b.spotSize > 1 && b.size == 1
+					&& b.isComplete()) {
+				b.setMaterials(0);
+				b.setConstructionCost(30);
+				b.setIncompleteImages(largeHutIncomplete);
+				b.setImage(largeHut);
+				b.setReserved(0);
+				stone -= 20;
+				wine -= 20;
+				gold -= 10;
+				b.size = 2;
+				return;
+			}
+		}
+	}
+
 	private void upgradeToMedium() {
 		for(Building b : buildings) {
-			if(b.spotSize > 0 && b.size == 0) {
+			if(b.getRole() == Role.BUILDER && b.spotSize > 0 && b.size == 0
+					&& b.isComplete()) {
 				b.setMaterials(0);
 				b.setConstructionCost(20);
 				b.setIncompleteImages(mediumHutIncomplete);

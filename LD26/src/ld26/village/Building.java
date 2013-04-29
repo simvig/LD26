@@ -3,6 +3,7 @@ package ld26.village;
 import ld26.Main;
 import ld26.ai.BuildJob;
 import ld26.ai.DeliverFoodJob;
+import ld26.ai.DeliverGoldJob;
 import ld26.ai.DeliverStoneJob;
 import ld26.ai.DeliverWineJob;
 import ld26.ai.DeliverWoodJob;
@@ -19,13 +20,17 @@ import org.newdawn.slick.SlickException;
 
 public class Building {
 
+	public static int largeHuts = 0;
+
 	private static int mediumHuts = 0;
 
 	private int builders = 0;
-
 	private int constructionCost;
 	private int farmers = 0;
+	private int goldMiners = 0;
+
 	private Image image;
+
 	private Image[] incompleteImages;
 
 	private int materials;
@@ -37,10 +42,10 @@ public class Building {
 	private Role role;
 
 	private float rotation;
-
 	public int size = 0;
 
 	private int spawnCounter = Village.SPAWN_DELAY;
+
 	public int spotSize = 0;
 
 	private boolean unreachable;
@@ -85,6 +90,10 @@ public class Building {
 		farmers += i;
 	}
 
+	public void addGoldMiner(int i) {
+		goldMiners += i;
+	}
+
 	public void addMaterials(int number) {
 		materials += number;
 		materialsReserved -= number;
@@ -100,8 +109,26 @@ public class Building {
 							try {
 								Main.message = new Message(new Image(
 										"Data/Images/bridgeBuilding.jpg"));
-								Map.getInstance().setUnblocked(18);
-								Map.getInstance().setUnblocked(19);
+								for(int river : Map.getInstance().rivers) {
+									Map.getInstance().setUnblocked(river);
+								}
+							} catch(SlickException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					} else if(size == 2) {
+						largeHuts++;
+						if(largeHuts == 3) {
+							try {
+								Main.message = new Message(new Image(
+										"Data/Images/goldRailings.jpg"));
+								for(int islandArea : Map.getInstance().islandAreas) {
+									Map.getInstance().setUnblocked(islandArea);
+								}
+								Village.getInstance().bigBridgeBuilt = true;
+
+								Village.getInstance().updatePathfinding();
 							} catch(SlickException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -111,23 +138,55 @@ public class Building {
 
 					break;
 				case WOODCUTTER:
-					woodcutters += 3;
+					woodcutters += 2;
 					Village.getInstance().addWoodcutter(3);
 					break;
 				case FARMER:
-					farmers += 5;
+					farmers += 3;
 					Village.getInstance().addFarmer(5);
 					break;
 				case MINER:
 					miners += 5;
 					Village.getInstance().addMiner(5);
+					if(spotSize == 2) {
+						try {
+							Main.message = new Message(new Image(
+									"Data/Images/end.jpg"), true);
+							Village.getInstance().secretEndingUnlocked = true;
+						} catch(SlickException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					break;
 				case BRIDGE:
 					Map.getInstance().accessRight();
+					if(Village.getInstance().nearestBridge == null) {
+						Village.getInstance().nearestBridge = this;
+					} else {
+						if(Map.getInstance().getDistance(
+								Village.getInstance().getCenter().getX(),
+								Village.getInstance().getCenter().getY(),
+								Village.getInstance().nearestBridge.getX(),
+								Village.getInstance().nearestBridge.getY()) > Map
+								.getInstance().getDistance(
+										x,
+										y,
+										Village.getInstance().getCenter()
+												.getX(),
+										Village.getInstance().getCenter()
+												.getY())) {
+							Village.getInstance().nearestBridge = this;
+						}
+					}
 					break;
 				case WINEMAKER:
 					winemakers += 3;
 					Village.getInstance().addWinemaker(3);
+					break;
+				case DIGGER:
+					goldMiners += 2;
+					Village.getInstance().addGoldMiners(2);
 					break;
 			}
 		}
@@ -242,20 +301,27 @@ public class Building {
 	public void setRole(Role role) {
 		this.role = role;
 		if(role == Role.BRIDGE) {
+			// for(int i = 0; i < image.getWidth(); i++) {
+			// for(int j = 0; j < image.getHeight(); j++) {
+			// if(image.getColor(i, j).getAlpha() > 0) {
+			// int oldX = i - image.getWidth() / 2;
+			// int oldY = j - image.getHeight() / 2;
+			//
+			// double newX = oldX * Math.cos(rotation) - oldY
+			// * Math.sin(rotation);
+			// double newY = oldX * Math.sin(rotation) + oldY
+			// * Math.cos(rotation);
+			//
+			// VillagerPathfinding.getInstance().setUnblocked(
+			// (int)(x + newX), (int)(y + newY));
+			// }
+			// }
+			// }
 			for(int i = 0; i < image.getWidth(); i++) {
 				for(int j = 0; j < image.getHeight(); j++) {
-					if(image.getColor(i, j).getAlpha() > 0) {
-						int oldX = i - image.getWidth() / 2;
-						int oldY = j - image.getHeight() / 2;
-
-						double newX = oldX * Math.cos(rotation) - oldY
-								* Math.sin(rotation);
-						double newY = oldX * Math.sin(rotation) + oldY
-								* Math.cos(rotation);
-
-						VillagerPathfinding.getInstance().setUnblocked(
-								(int)(x + newX), (int)(y + newY));
-					}
+					VillagerPathfinding.getInstance().setUnblocked(
+							x + i - image.getWidth() / 2,
+							y + j - image.getHeight() / 2);
 				}
 			}
 		}
@@ -302,6 +368,22 @@ public class Building {
 					new DeliverFoodJob(p)));
 			p.addWaypoint(new Waypoint(this, new GoHomeJob(p)));
 			p.setRole(Role.FARMER);
+			Village.getInstance().addPerson(p);
+			p.startRoute();
+		}
+	}
+
+	private void spawnGoldMiner() {
+		if(spawnCounter <= 0 && goldMiners > 0
+				&& Village.getInstance().getFood() > 0) {
+			Village.getInstance().addFood(-1);
+			spawnCounter = Village.SPAWN_DELAY;
+			goldMiners--;
+			Person p = new Person(this);
+			p.addWaypoint(new Waypoint(Village.getInstance().getCenter(),
+					new DeliverGoldJob(p)));
+			p.addWaypoint(new Waypoint(this, new GoHomeJob(p)));
+			p.setRole(Role.DIGGER);
 			Village.getInstance().addPerson(p);
 			p.startRoute();
 		}
@@ -374,6 +456,9 @@ public class Building {
 					break;
 				case WINEMAKER:
 					spawnWinemaker();
+					break;
+				case DIGGER:
+					spawnGoldMiner();
 					break;
 			}
 		}

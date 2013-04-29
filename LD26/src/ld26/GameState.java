@@ -3,12 +3,14 @@ package ld26;
 import ld26.ai.VillagerPathfinding;
 import ld26.input.InputHandler;
 import ld26.map.Map;
+import ld26.ui.Message;
 import ld26.ui.SoundManager;
 import ld26.ui.UI;
 import ld26.village.Village;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
@@ -26,6 +28,7 @@ public class GameState extends BasicGameState {
 	@Override
 	public void init(GameContainer arg0, StateBasedGame sbg)
 			throws SlickException {
+
 		Map.getInstance().init();
 		VillagerPathfinding.getInstance().init();
 		Village.getInstance().init();
@@ -56,6 +59,10 @@ public class GameState extends BasicGameState {
 	@Override
 	public void update(GameContainer container, StateBasedGame sbg, int delta)
 			throws SlickException {
+		if(!MenuState.newGameStarted) {
+			MenuState.newGameStarted = true;
+			Main.message = new Message(new Image("Data/Images/welcome.jpg"));
+		}
 		if(Main.message == null) {
 			InputHandler.getInstance().handleInput(container, sbg);
 		} else {
