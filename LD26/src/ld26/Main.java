@@ -15,7 +15,7 @@ public class Main extends StateBasedGame {
 	public static void main(String[] args) {
 		try {
 			AppGameContainer container = new AppGameContainer(new Main());
-			container.setDisplayMode(1024, 768, false);
+			container.setDisplayMode(1024, 768, true);
 			container.setShowFPS(false);
 			container.setIcon("Data/Images/icon.png");
 			container.start();
